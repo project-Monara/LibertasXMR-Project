@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LibertasXMR - P2P Monero Exchange</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07070c;--bg2:#0d0d16;--bg3:#161624;--card:#0f0f1e;--border:#222240;--fg:#e2e2f0;--muted:#7c7c9a;--accent:#e8740c;--accent2:#f59e0b;--adim:rgba(232,116,12,.1);--danger:#dc2626;--success:#16a34a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden}
+h1,h2,h3,.lf{font-family:'Orbitron',sans-serif}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
+.bg-atm{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 900px 500px at 12% 8%,rgba(232,116,12,.05),transparent 70%),radial-gradient(ellipse 600px 600px at 88% 90%,rgba(245,158,11,.03),transparent 70%),linear-gradient(rgba(232,116,12,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(232,116,12,.02) 1px,transparent 1px);background-size:100% 100%,100% 100%,55px 55px,55px 55px;animation:ap 10s ease-in-out infinite alternate}
+@keyframes ap{0%{opacity:.35}100%{opacity:1}}
+.ptcl{position:fixed;border-radius:50%;pointer-events:none;z-index:0;background:var(--accent);opacity:0;animation:pfl linear infinite}
+@keyframes pfl{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:.4}90%{opacity:.4}100%{transform:translateY(-10vh) scale(1);opacity:0}}
+.vw{display:none;position:relative;z-index:1;min-height:100vh}.vw.on{display:block;animation:vi .3s ease-out}
+@keyframes vi{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+.bp{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;padding:11px 26px;border-radius:10px;border:none;cursor:pointer;transition:all .2s;font-family:'Space Grotesk';font-size:13px;box-shadow:0 4px 18px rgba(232,116,12,.25)}
+.bp:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(232,116,12,.45)}
+.bs{background:transparent;color:var(--accent);border:2px solid var(--accent);padding:9px 20px;border-radius:10px;cursor:pointer;font-weight:600;transition:all .2s;font-family:'Space Grotesk';font-size:12px}
+.bs:hover{background:var(--adim)}
+.bd{background:var(--danger);color:#fff;padding:7px 15px;border-radius:8px;border:none;cursor:pointer;font-weight:600;transition:all .2s;font-family:'Space Grotesk';font-size:11px}
+.bd:hover{opacity:.8}
+.bsm{padding:7px 14px;font-size:11px;border-radius:7px}
+.gc{background:rgba(15,15,30,.9);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:14px;padding:24px;transition:all .3s}
+.gc:hover{border-color:rgba(232,116,12,.3);box-shadow:0 0 24px rgba(232,116,12,.06)}
+.inp{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:9px;color:var(--fg);font-family:'Space Grotesk';font-size:13px;transition:all .2s;outline:none}
+.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,116,12,.1)}
+.inp::placeholder{color:var(--muted)}
+.fb{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:var(--bg);border:1px solid var(--border);border-radius:18px;cursor:pointer;transition:all .2s;font-size:12px}
+.fb:hover,.fb.sl{border-color:var(--accent);background:var(--adim)}
+.ca{height:320px;overflow-y:auto;padding:12px;background:var(--bg);border-radius:11px;border:1px solid var(--border)}
+.cm{margin-bottom:9px;animation:ci .2s ease-out}
+@keyframes ci{0%{opacity:0;transform:translateY(5px)}100%{opacity:1;transform:translateY(0)}}
+.cm.me{text-align:right}
+.cm .bb{display:inline-block;max-width:70%;padding:8px 14px;border-radius:13px;font-size:12px;line-height:1.5}
+.cm.me .bb{background:var(--accent);color:#fff;border-bottom-right-radius:3px}
+.cm.th .bb{background:var(--bg3);color:var(--fg);border-bottom-left-radius:3px}
+.dt{width:100%;border-collapse:collapse}
+.dt th{text-align:left;padding:10px 12px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border)}
+.dt td{padding:10px 12px;border-bottom:1px solid rgba(34,34,64,.4);font-size:12px}
+.dt tr:hover td{background:rgba(232,116,12,.03)}
+.tc{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+.tt{padding:12px 18px;border-radius:9px;font-size:12px;font-weight:500;animation:ti .3s ease-out;min-width:240px;box-shadow:0 5px 24px rgba(0,0,0,.4)}
+.tt.s{background:#14532d;color:#bbf7d0;border:1px solid #16a34a}
+.tt.e{background:#7f1d1d;color:#fecaca;border:1px solid #dc2626}
+.tt.i{background:#1e3a5f;color:#bfdbfe;border:1px solid #3b82f6}
+@keyframes ti{0%{opacity:0;transform:translateX(30px)}100%{opacity:1;transform:translateX(0)}}
+.wp{animation:wp 2s ease-in-out infinite}
+@keyframes wp{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.2)}50%{box-shadow:0 0 16px 3px rgba(220,38,38,.1)}}
+.tb{padding:8px 20px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-family:'Space Grotesk';font-weight:600;font-size:12px;border-bottom:2px solid transparent;transition:all .2s}
+.tb.act{color:var(--accent);border-bottom-color:var(--accent)}
+.tb:hover{color:var(--fg)}
+.nl{color:var(--muted);text-decoration:none;font-weight:500;font-size:12px;transition:color .2s;cursor:pointer}
+.nl:hover{color:var(--accent)}
+.oc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;transition:all .3s;cursor:pointer}
+.oc:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 5px 24px rgba(232,116,12,.07)}
+.sn{font-family:'Orbitron';font-size:26px;font-weight:700;color:var(--accent)}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;align-items:center;justify-content:center}
+.mo.on{display:flex}
+.mbox{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:440px;width:92%;max-height:85vh;overflow-y:auto;animation:vi .25s ease-out}
+.dv{height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.2;margin:32px 0}
+.li{width:36px;height:36px;object-fit:contain;border-radius:50%}
+.lm{width:80px;height:80px;object-fit:contain;border-radius:50%;filter:drop-shadow(0 0 14px rgba(232,116,12,.35))}
+.ll{width:100px;height:100px;object-fit:contain;border-radius:50%;filter:drop-shadow(0 0 20px rgba(232,116,12,.4));animation:lfl 5s ease-in-out infinite}
+@keyframes lfl{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.db{background:rgba(232,116,12,.06);border-bottom:1px solid rgba(232,116,12,.15);padding:8px 16px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.db .adr{font-family:monospace;font-size:10px;color:var(--accent);max-width:440px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:768px){.dh{display:none!important}.mc{flex-direction:column!important}.sn{font-size:20px}.gc{padding:16px}.db{flex-direction:column;gap:6px;padding:6px 10px}.db .adr{max-width:280px;font-size:8px}}
+</style>
+</head>
+<body>
+<div class="bg-atm"></div>
+<div id="ptcls"></div>
+<div class="tc" id="tC"></div>
+
+<!-- ==================== LANDING ==================== -->
+<div class="vw on" id="vLand">
+<div class="db">
+  <img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" style="width:22px;height:22px;border-radius:50%;object-fit:contain">
+  <span style="font-size:10px;color:var(--muted)"><i class="fas fa-heart mr-1" style="color:var(--accent)"></i>Support LibertasXMR — Donate XMR:</span>
+  <img src="https://z-cdn-media.chatglm.cn/files/c6c6dc37-7336-43b7-88c0-85bcf17961ab.png?auth_key=1878898256-719f38bdc15b4c5b811bc593228433b0-0-4f81810c43f589e5a19df88465c4d60b" alt="XMR QR" style="width:56px;height:56px;border-radius:6px;border:1px solid var(--accent);padding:2px;background:#fff;image-rendering:pixelated">
+  <span class="adr">46rkM2n1YnHLe95X8VwRZW6Kbi1pmLDuyDzJz4HS2DmZBw3Ss4mBYCb7x7ViEbUnoqEi9Vcd4yr4ZjJymAKv73447qFWuCv</span>
+  <button class="bs bsm" onclick="copyAddr()" style="padding:4px 10px;font-size:10px"><i class="fas fa-copy mr-1"></i>Copy</button>
+</div>
+<nav class="flex items-center justify-between px-5 py-3" style="background:rgba(7,7,12,.93);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)">
+  <div class="flex items-center gap-2">
+    <img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="LibertasXMR" class="li">
+    <div><div class="lf text-xs font-bold" style="color:var(--muted)">LIBERTAS <span style="color:var(--accent)">XMR</span></div><div style="font-size:9px;color:var(--accent)">P2P SWAP</div></div>
+  </div>
+  <div class="flex items-center gap-4">
+    <span class="nl dh" onclick="scrollAb()">About</span>
+    <span class="nl dh" onclick="gV('vRules')">Rules</span>
+    <span class="nl dh" onclick="gV('vTerms')">Terms</span>
+    <select id="l1" onchange="sL(this.value)" class="inp" style="width:auto;padding:4px 8px;font-size:10px;background:var(--bg2)"><option value="en">EN</option><option value="pt">PT-BR</option></select>
+    <button class="bp bsm" onclick="gV('vAuth')"><i class="fas fa-bolt mr-1"></i><span data-t="enterBtn">Enter</span></button>
+  </div>
+</nav>
+<section class="flex flex-col items-center justify-center text-center px-5 pt-14 pb-10">
+  <img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" class="ll mb-5">
+  <h1 class="lf text-3xl md:text-5xl font-black mb-3">LIBERTAS <span style="color:var(--accent)">XMR</span></h1>
+  <p class="text-sm md:text-base max-w-2xl mb-2" style="color:var(--muted)" data-t="heroSub">The true successor to LocalMonero & AgoraDesk. Peer-to-peer Monero trading. No KYC. No middleman. Pure freedom.</p>
+  <p class="text-xs mb-7" style="color:var(--accent)" data-t="heroSub2">Semi-decentralized. Trust-based. Community-driven.</p>
+  <div class="flex gap-3 flex-wrap justify-center mb-8">
+    <button class="bp text-sm px-7 py-3" onclick="gV('vAuth')"><i class="fas fa-exchange-alt mr-2"></i><span data-t="startTrading">Start Trading</span></button>
+    <button class="bs text-sm px-6 py-3" onclick="scrollAb()"><i class="fas fa-info-circle mr-2"></i><span data-t="learnMore">Learn More</span></button>
+  </div>
+  <div class="flex gap-7 flex-wrap justify-center">
+    <div class="text-center"><div class="sn" id="sU">0</div><div style="font-size:10px;color:var(--muted)" data-t="statUsers">Active Users</div></div>
+    <div class="text-center"><div class="sn" id="sT">0</div><div style="font-size:10px;color:var(--muted)" data-t="statTrades">Trades</div></div>
+    <div class="text-center"><div class="sn">13</div><div style="font-size:10px;color:var(--muted)" data-t="statC">Countries</div></div>
+  </div>
+</section>
+<section class="max-w-5xl mx-auto px-5 py-10">
+  <h2 class="lf text-lg font-bold text-center mb-8" data-t="howTitle">How It Works</h2>
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="gc text-center"><div class="text-3xl mb-3" style="color:var(--accent)"><i class="fas fa-user-shield"></i></div><h3 class="font-bold text-sm mb-2" data-t="s1t">1. Register Anonymously</h3><p style="font-size:12px;color:var(--muted)" data-t="s1d">Use any email and a pseudonym. No KYC, no personal data. Your privacy is sacred.</p></div>
+    <div class="gc text-center"><div class="text-3xl mb-3" style="color:var(--accent)"><i class="fas fa-handshake"></i></div><h3 class="font-bold text-sm mb-2" data-t="s2t">2. Find Your Counterparty</h3><p style="font-size:12px;color:var(--muted)" data-t="s2d">Browse offers. Choose your currency and payment method. Enter a private chat.</p></div>
+    <div class="gc text-center"><div class="text-3xl mb-3" style="color:var(--accent)"><i class="fab fa-monero"></i></div><h3 class="font-bold text-sm mb-2" data-t="s3t">3. Trade Directly</h3><p style="font-size:12px;color:var(--muted)" data-t="s3d">No escrow. No middleman. Trade XMR directly on trust. The site only connects peers. Send money ONLY after receiving XMR.</p></div>
+  </div>
+</section>
+<div class="dv max-w-4xl mx-auto"></div>
+<section id="abSec" class="max-w-4xl mx-auto px-5 py-10">
+  <h2 class="lf text-lg font-bold text-center mb-6" data-t="aboutTitle">About LibertasXMR</h2>
+  <div class="gc mb-4"><h3 class="font-bold text-sm mb-2" style="color:var(--accent)" data-t="histTitle">Our History</h3><p style="font-size:12px;line-height:1.7;color:var(--muted)" data-t="histText">When LocalMonero and AgoraDesk shut down, the P2P Monero community was left orphaned. Thousands of users who relied on peer-to-peer, no-KYC trading had nowhere to go. LibertasXMR was born from this void in 2026 — created by Brazilian developer Iury Lee as a direct response to the centralization and surveillance creeping into crypto exchanges. We believe financial privacy is a human right, and Monero is its strongest tool. This platform is semi-decentralized: we connect buyers and sellers, but we never hold your funds. No escrow, no KYC, no surveillance. Just people trading Monero freely.</p></div>
+  <div class="gc mb-4"><h3 class="font-bold text-sm mb-2" style="color:var(--accent)" data-t="whyTitle">Why LibertasXMR?</h3><ul style="font-size:12px;color:var(--muted)" class="space-y-1"><li><i class="fas fa-check mr-1" style="color:var(--success)"></i>Direct successor to LocalMonero & AgoraDesk</li><li><i class="fas fa-check mr-1" style="color:var(--success)"></i>No KYC — anonymous emails and pseudonyms only</li><li><i class="fas fa-check mr-1" style="color:var(--success)"></i>No escrow — we never hold your money</li><li><i class="fas fa-check mr-1" style="color:var(--success)"></i>USDT to XMR swap tab — no KYC needed</li><li><i class="fas fa-check mr-1" style="color:var(--success)"></i>Semi-decentralized — community-driven and open</li><li><i class="fas fa-check mr-1" style="color:var(--success)"></i>Respect-based community — scammers are banned</li><li><i class="fas fa-check mr-1" style="color:var(--success)"></i>Multi-currency support with country flags</li><li><i class="fas fa-check mr-1" style="color:var(--success)"></i>Private chat between buyer and seller</li></ul></div>
+  <div class="gc"><h3 class="font-bold text-sm mb-2" style="color:var(--accent)" data-t="devTitle">The Developer</h3><p style="font-size:12px;color:var(--muted)" data-t="devText">LibertasXMR was designed and developed by Iury Lee, a Brazilian developer passionate about cryptocurrency freedom and privacy rights. All rights reserved. This project is maintained through voluntary donations — no fees, no hidden charges.</p></div>
+</section>
+<div class="dv max-w-4xl mx-auto"></div>
+<footer class="text-center py-5" style="border-top:1px solid var(--border)">
+  <div class="flex items-center justify-center gap-2 mb-1"><img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" style="width:20px;height:20px;border-radius:50%;object-fit:contain"><span class="lf text-xs font-bold">LIBERTAS <span style="color:var(--accent)">XMR</span></span></div>
+  <p style="font-size:10px;color:var(--muted)">&copy; 2026 LibertasXMR. All rights reserved to Iury Lee.</p>
+  <div class="flex gap-3 justify-center mt-1"><span class="nl" style="font-size:10px" onclick="gV('vRules')">Rules</span><span class="nl" style="font-size:10px" onclick="gV('vTerms')">Terms</span></div>
+</footer>
+</div>
+
+<!-- ==================== AUTH ==================== -->
+<div class="vw" id="vAuth">
+<div class="db">
+  <img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" style="width:20px;height:20px;border-radius:50%;object-fit:contain">
+  <span style="font-size:9px;color:var(--muted)"><i class="fas fa-heart mr-1" style="color:var(--accent)"></i>Donate XMR:</span>
+  <img src="https://z-cdn-media.chatglm.cn/files/c6c6dc37-7336-43b7-88c0-85bcf17961ab.png?auth_key=1878898256-719f38bdc15b4c5b811bc593228433b0-0-4f81810c43f589e5a19df88465c4d60b" alt="QR" style="width:44px;height:44px;border-radius:4px;border:1px solid var(--accent);padding:1px;background:#fff;image-rendering:pixelated">
+  <span class="adr">46rkM2n1YnHLe95X8VwRZW6Kbi1pmLDuyDzJz4HS2DmZBw3Ss4mBYCb7x7ViEbUnoqEi9Vcd4yr4ZjJymAKv73447qFWuCv</span>
+  <button class="bs bsm" onclick="copyAddr()" style="padding:3px 8px;font-size:9px"><i class="fas fa-copy"></i></button>
+</div>
+<nav class="flex items-center justify-between px-5 py-3" style="background:rgba(7,7,12,.95);border-bottom:1px solid var(--border)">
+  <div class="flex items-center gap-2 cursor-pointer" onclick="gV('vLand')"><img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" class="li"><span class="lf text-xs font-bold">LIBERTAS <span style="color:var(--accent)">XMR</span></span></div>
+  <select id="l2" onchange="sL(this.value)" class="inp" style="width:auto;padding:4px 8px;font-size:10px;background:var(--bg2)"><option value="en">EN</option><option value="pt">PT-BR</option></select>
+</nav>
+<div class="flex flex-col items-center justify-center px-5 py-8" style="min-height:calc(100vh - 100px)">
+  <img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" class="lm mb-4">
+  <h2 class="lf text-lg font-bold mb-2" data-t="authTitle">Do you want to Buy or Sell XMR?</h2>
+  <p style="font-size:12px;color:var(--muted)" class="mb-7" data-t="authSub">Choose your role. Same freedom, same privacy.</p>
+  <div class="flex gap-4 flex-wrap justify-center mb-7 mc" style="max-width:660px;width:100%">
+    <div class="gc text-center flex-1" style="min-width:260px" id="rBuy"><div class="text-4xl mb-2" style="color:var(--accent)"><i class="fas fa-shopping-cart"></i></div><h3 class="lf text-sm font-bold mb-1" data-t="buyTitle">I Want to Buy XMR</h3><p style="font-size:11px;color:var(--muted)" class="mb-4" data-t="buyDesc">Find sellers, negotiate, purchase Monero anonymously.</p><button class="bp w-full" onclick="pR('buyer')"><i class="fas fa-arrow-right mr-1"></i><span data-t="enterBuy">Enter as Buyer</span></button></div>
+    <div class="gc text-center flex-1" style="min-width:260px" id="rSell"><div class="text-4xl mb-2" style="color:var(--accent)"><i class="fas fa-coins"></i></div><h3 class="lf text-sm font-bold mb-1" data-t="sellTitle">I Want to Sell XMR</h3><p style="font-size:11px;color:var(--muted)" class="mb-4" data-t="sellDesc">List offers, set your price, sell to trusted buyers.</p><button class="bp w-full" onclick="pR('seller')"><i class="fas fa-arrow-right mr-1"></i><span data-t="enterSell">Enter as Seller</span></button></div>
+  </div>
+  <div class="gc" style="width:100%;max-width:400px;display:none" id="aF">
+    <div class="flex mb-4" style="border-bottom:1px solid var(--border)"><button class="tb act" id="tL" onclick="aT('login')" data-t="login">Login</button><button class="tb" id="tR" onclick="aT('register')" data-t="register">Register</button></div>
+    <div class="mb-2"><label style="font-size:10px;font-weight:bold;color:var(--muted)" class="mb-1 block" data-t="emLabel">Anonymous Email</label><input type="email" id="aE" class="inp" placeholder="your@email.com"></div>
+    <div class="mb-2" id="pF" style="display:none"><label style="font-size:10px;font-weight:bold;color:var(--muted)" class="mb-1 block" data-t="psLabel">Pseudonym</label><input type="text" id="aP" class="inp" placeholder="SatoshiGhost"></div>
+    <div class="mb-3"><label style="font-size:10px;font-weight:bold;color:var(--muted)" class="mb-1 block" data-t="pwLabel">Password</label><input type="password" id="aPw" class="inp" placeholder="********"></div>
+    <button class="bp w-full" id="aBtn" onclick="dA()"><i class="fas fa-sign-in-alt mr-1"></i><span data-t="login">Login</span></button>
+    <p class="text-center mt-4" style="font-size:10px;color:var(--muted)"><span class="nl" onclick="gV('vAdmin')" style="font-size:10px"><i class="fas fa-lock mr-1" style="color:var(--danger)"></i>Admin Access</span></p>
+  </div>
+</div>
+</div>
+
+<!-- ==================== BUYER ==================== -->
+<div class="vw" id="vBuyer">
+<div class="db"><img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" style="width:18px;height:18px;border-radius:50%;object-fit:contain"><span style="font-size:9px;color:var(--muted)"><i class="fas fa-heart mr-1" style="color:var(--accent)"></i>Donate XMR:</span><img src="https://z-cdn-media.chatglm.cn/files/c6c6dc37-7336-43b7-88c0-85bcf17961ab.png?auth_key=1878898256-719f38bdc15b4c5b811bc593228433b0-0-4f81810c43f589e5a19df88465c4d60b" alt="QR" style="width:38px;height:38px;border-radius:4px;border:1px solid var(--accent);padding:1px;background:#fff;image-rendering:pixelated"><span class="adr">46rkM2n1YnHLe95X8VwRZW6Kbi1pmLDuyDzJz4HS2DmZ...</span><button class="bs bsm" onclick="copyAddr()" style="padding:3px 7px;font-size:9px"><i class="fas fa-copy"></i></button></div>
+<nav class="flex items-center justify-between px-5 py-2" style="background:rgba(7,7,12,.95);border-bottom:1px solid var(--border)"><div class="flex items-center gap-2 cursor-pointer" onclick="gV('vLand')"><img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" class="li"><span class="lf text-xs font-bold">LIBERTAS <span style="color:var(--accent)">XMR</span></span></div><div class="flex items-center gap-2"><span style="font-size:10px;color:var(--muted)"><i class="fas fa-shopping-cart mr-1" style="color:var(--accent)"></i><span data-t="buyerMode">Buyer</span></span><span style="font-size:11px;font-weight:bold;color:var(--accent)" id="bN"></span><button class="bs bsm" onclick="dLo()"><i class="fas fa-sign-out-alt mr-1"></i><span data-t="logout">Logout</span></button></div></nav>
+<div class="max-w-6xl mx-auto px-4 py-5">
+  <div class="wp mb-5 p-3 rounded-xl" style="background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.25)"><p style="font-size:11px;font-weight:bold;color:#fca5a5"><i class="fas fa-exclamation-triangle mr-1"></i><span data-t="warnBuy">WARNING: NO escrow. Only send payment AFTER you receive XMR. The site only connects peers and is NOT responsible for trades. No scams. Respect the rules.</span></p></div>
+  <h2 class="lf text-base font-bold mb-4" data-t="buyXMR">Buy Monero (XMR)</h2>
+  <div class="gc mb-5"><h3 class="font-bold text-sm mb-3" style="color:var(--accent)"><i class="fas fa-globe mr-1"></i><span data-t="selCur">Select Your Currency</span></h3><div class="flex flex-wrap gap-2" id="cG"></div></div>
+  <div class="gc mb-5"><div class="flex items-center justify-between mb-3"><h3 class="font-bold text-sm" style="color:var(--accent)"><i class="fas fa-list mr-1"></i><span data-t="availOff">Available Offers</span></h3><span style="font-size:10px;color:var(--muted)" id="bCL">BRL</span></div><div id="bO"></div><p id="bNO" class="text-center text-sm py-5" style="color:var(--muted);display:none" data-t="noOff">No offers for this currency yet.</p></div>
+  <div class="gc mb-5"><h3 class="font-bold text-sm mb-2" style="color:var(--accent)"><i class="fas fa-exchange-alt mr-1"></i><span data-t="usdtTab">USDT to XMR Swap</span></h3><p style="font-size:11px;color:var(--muted)" class="mb-2" data-t="usdtDesc">Trade USDT for Monero with peers. No KYC required.</p><div id="uO"></div></div>
+  <div class="gc"><h3 class="font-bold text-sm mb-2" style="color:var(--danger)"><i class="fas fa-user-cog mr-1"></i><span data-t="accMgmt">Account Management</span></h3><button class="bd" onclick="dAc()"><i class="fas fa-trash mr-1"></i><span data-t="delAcc">Delete Account & Data</span></button></div>
+</div>
+</div>
+
+<!-- ==================== SELLER ==================== -->
+<div class="vw" id="vSeller">
+<div class="db"><img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" style="width:18px;height:18px;border-radius:50%;object-fit:contain"><span style="font-size:9px;color:var(--muted)"><i class="fas fa-heart mr-1" style="color:var(--accent)"></i>Donate XMR:</span><img src="https://z-cdn-media.chatglm.cn/files/c6c6dc37-7336-43b7-88c0-85bcf17961ab.png?auth_key=1878898256-719f38bdc15b4c5b811bc593228433b0-0-4f81810c43f589e5a19df88465c4d60b" alt="QR" style="width:38px;height:38px;border-radius:4px;border:1px solid var(--accent);padding:1px;background:#fff;image-rendering:pixelated"><span class="adr">46rkM2n1YnHLe95X8VwRZW6Kbi1pmLDuyDzJz4HS2DmZ...</span><button class="bs bsm" onclick="copyAddr()" style="padding:3px 7px;font-size:9px"><i class="fas fa-copy"></i></button></div>
+<nav class="flex items-center justify-between px-5 py-2" style="background:rgba(7,7,12,.95);border-bottom:1px solid var(--border)"><div class="flex items-center gap-2 cursor-pointer" onclick="gV('vLand')"><img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" class="li"><span class="lf text-xs font-bold">LIBERTAS <span style="color:var(--accent)">XMR</span></span></div><div class="flex items-center gap-2"><span style="font-size:10px;color:var(--muted)"><i class="fas fa-coins mr-1" style="color:var(--accent)"></i><span data-t="sellerMode">Seller</span></span><span style="font-size:11px;font-weight:bold;color:var(--accent)" id="sN"></span><button class="bs bsm" onclick="dLo()"><i class="fas fa-sign-out-alt mr-1"></i><span data-t="logout">Logout</span></button></div></nav>
+<div class="max-w-6xl mx-auto px-4 py-5">
+  <div class="wp mb-5 p-3 rounded-xl" style="background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.25)"><p style="font-size:11px;font-weight:bold;color:#fca5a5"><i class="fas fa-exclamation-triangle mr-1"></i><span data-t="warnSell">WARNING: No escrow. Only release XMR AFTER confirming payment. The site is NOT responsible. No scams. Respect the rules.</span></p></div>
+  <h2 class="lf text-base font-bold mb-4" data-t="sellXMR">Sell Monero (XMR)</h2>
+  <div class="gc mb-5"><h3 class="font-bold text-sm mb-2" style="color:var(--accent)"><i class="fas fa-comments mr-1"></i><span data-t="incTrades">Incoming Trade Requests</span></h3><div id="sCL"></div><p id="nCh" class="text-center text-sm py-3" style="color:var(--muted)" data-t="noChats">No incoming trade requests yet.</p></div>
+  <div class="gc mb-5"><h3 class="font-bold text-sm mb-2" style="color:var(--accent)"><i class="fas fa-plus-circle mr-1"></i><span data-t="createOff">Create Offer</span></h3>
+    <div class="grid md:grid-cols-2 gap-2"><div><label style="font-size:10px;font-weight:bold;color:var(--muted)" class="mb-1 block" data-t="offCur">Currency</label><select id="oC" class="inp"></select></div><div><label style="font-size:10px;font-weight:bold;color:var(--muted)" class="mb-1 block" data-t="offPrice">Price per XMR</label><input type="number" id="oPr" class="inp" placeholder="0.00"></div><div><label style="font-size:10px;font-weight:bold;color:var(--muted)" class="mb-1 block" data-t="offMin">Min Amount (XMR)</label><input type="number" id="oMn" class="inp" placeholder="0.1" step="0.01"></div><div><label style="font-size:10px;font-weight:bold;color:var(--muted)" class="mb-1 block" data-t="offMax">Max Amount (XMR)</label><input type="number" id="oMx" class="inp" placeholder="5.0" step="0.01"></div><div class="md:col-span-2"><label style="font-size:10px;font-weight:bold;color:var(--muted)" class="mb-1 block" data-t="offPay">Payment Method</label><input type="text" id="oPm" class="inp" placeholder="PIX, Bank Transfer, PayPal..."></div><div class="md:col-span-2"><label style="font-size:10px;font-weight:bold;color:var(--muted)" class="mb-1 block" data-t="offTerms">Offer Terms</label><input type="text" id="oTm" class="inp" placeholder="e.g. Send receipt before XMR release"></div></div>
+    <button class="bp mt-2" onclick="cOf()"><i class="fas fa-paper-plane mr-1"></i><span data-t="pubOff">Publish Offer</span></button></div>
+  <div class="gc mb-5"><h3 class="font-bold text-sm mb-2" style="color:var(--accent)"><i class="fas fa-clipboard-list mr-1"></i><span data-t="myOff">My Offers</span></h3><div id="sMO"></div><p id="nMO" class="text-center text-sm py-3" style="color:var(--muted)" data-t="noMyOff">No offers created yet.</p></div>
+  <div class="gc"><h3 class="font-bold text-sm mb-2" style="color:var(--danger)"><i class="fas fa-user-cog mr-1"></i><span data-t="accMgmt">Account Management</span></h3><button class="bd" onclick="dAc()"><i class="fas fa-trash mr-1"></i><span data-t="delAcc">Delete Account & Data</span></button></div>
+</div>
+</div>
+
+<!-- ==================== CHAT ==================== -->
+<div class="vw" id="vChat">
+<nav class="flex items-center justify-between px-5 py-2" style="background:rgba(7,7,12,.95);border-bottom:1px solid var(--border)"><div class="flex items-center gap-2 cursor-pointer" onclick="gV('vLand')"><img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" class="li"><span class="lf text-xs font-bold">LIBERTAS <span style="color:var(--accent)">XMR</span></span></div><div class="flex items-center gap-2"><span style="font-size:11px;font-weight:bold;color:var(--accent)" id="cW"></span><button class="bs bsm" id="cB"><i class="fas fa-arrow-left mr-1"></i><span data-t="backDash">Back</span></button></div></nav>
+<div class="max-w-3xl mx-auto px-4 py-5">
+  <div class="gc mb-3" id="cI"></div>
+  <div class="wp mb-3 p-3 rounded-xl" style="background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.3)"><p style="font-size:10px;font-weight:bold;color:#fca5a5"><i class="fas fa-shield-alt mr-1"></i><span data-t="chatWarn">REMINDER: NO escrow. The site only connects you. Do NOT send money before receiving XMR (buyer). Do NOT release XMR before confirming payment (seller). NO mediation. Trade at your own risk. Respect the rules. No scams.</span></p></div>
+  <div class="ca" id="cM"></div>
+  <div class="flex gap-2 mt-2"><input type="text" id="cIn" class="inp" placeholder="Type your message..." onkeydown="if(event.key==='Enter')sMsg()"><button class="bp" onclick="sMsg()"><i class="fas fa-paper-plane"></i></button></div>
+</div>
+</div>
+
+<!-- ==================== ADMIN ==================== -->
+<div class="vw" id="vAdmin">
+<nav class="flex items-center justify-between px-5 py-2" style="background:rgba(7,7,12,.95);border-bottom:1px solid var(--border)"><div class="flex items-center gap-2 cursor-pointer" onclick="gV('vLand')"><img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" class="li"><span class="lf text-xs font-bold">LIBERTAS <span style="color:var(--accent)">XMR</span> <span style="font-size:9px;color:var(--danger)">ADMIN</span></span></div><button class="bs bsm" onclick="gV('vLand')"><i class="fas fa-arrow-left mr-1"></i> Home</button></nav>
+
+<!-- Admin Login / Register -->
+<div id="aL" class="flex flex-col items-center justify-center px-5" style="min-height:calc(100vh - 50px)">
+  <div class="gc" style="width:100%;max-width:400px">
+    <div class="text-center mb-4">
+      <img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" class="lm mx-auto mb-2">
+      <h2 class="lf text-base font-bold mb-1">Admin Panel</h2>
+      <p style="font-size:10px;color:var(--danger)"><i class="fas fa-lock mr-1"></i>Restricted — Site owner only</p>
+    </div>
+    <!-- Abas Login / Register -->
+    <div class="flex mb-4" style="border-bottom:1px solid var(--border)">
+      <button class="tb act" id="aTL" onclick="admTab('login')">Login</button>
+      <button class="tb" id="aTR" onclick="admTab('register')">Register</button>
+    </div>
+    <div id="admRegMsg" style="display:none" class="mb-3 p-2 rounded-lg text-center" style="background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.3)">
+      <p style="font-size:10px;color:#86efac"><i class="fas fa-info-circle mr-1"></i>Create your admin account. Only ONE admin account can exist.</p>
+    </div>
+    <div class="mb-3"><label style="font-size:10px;font-weight:bold;color:var(--muted)" class="mb-1 block">Admin Email</label><input type="email" id="admE" class="inp" placeholder="admin@example.com"></div>
+    <div class="mb-4"><label style="font-size:10px;font-weight:bold;color:var(--muted)" class="mb-1 block">Password</label><input type="password" id="admPw" class="inp" placeholder="********"></div>
+    <button class="bp w-full" id="admBtn" onclick="admAuth()"><i class="fas fa-lock mr-1"></i>Login</button>
+    <p class="text-center mt-3"><span class="nl" onclick="gV('vAuth')" style="font-size:10px"><i class="fas fa-arrow-left mr-1"></i>Back to User Login</span></p>
+  </div>
+</div>
+
+<!-- Admin Dashboard -->
+<div id="aD" style="display:none" class="max-w-6xl mx-auto px-4 py-5">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="lf text-base font-bold"><i class="fas fa-cog mr-2" style="color:var(--accent)"></i>Admin Dashboard</h2>
+    <div class="flex gap-2">
+      <span style="font-size:10px;color:var(--muted)">Logged as: <span style="color:var(--accent)" id="admWho"></span></span>
+      <button class="bs bsm" onclick="admLogout()"><i class="fas fa-sign-out-alt mr-1"></i>Logout</button>
+    </div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+    <div class="gc text-center"><div class="sn" id="aSB">0</div><div style="font-size:10px;color:var(--muted)">Buyers</div></div>
+    <div class="gc text-center"><div class="sn" id="aSS">0</div><div style="font-size:10px;color:var(--muted)">Sellers</div></div>
+    <div class="gc text-center"><div class="sn" id="aSO">0</div><div style="font-size:10px;color:var(--muted)">Offers</div></div>
+    <div class="gc text-center"><div class="sn" id="aSC">0</div><div style="font-size:10px;color:var(--muted)">Chats</div></div>
+  </div>
+  <div class="gc mb-5"><h3 class="font-bold text-sm mb-2" style="color:var(--accent)"><i class="fas fa-shopping-cart mr-1"></i>Buyers</h3><div style="overflow-x:auto"><table class="dt"><thead><tr><th>Pseudonym</th><th>Email</th><th>Registered</th><th>Action</th></tr></thead><tbody id="aBT"></tbody></table></div><p id="aNBT" class="text-center text-sm py-3" style="color:var(--muted);display:none">No buyers yet.</p></div>
+  <div class="gc mb-5"><h3 class="font-bold text-sm mb-2" style="color:var(--accent)"><i class="fas fa-coins mr-1"></i>Sellers</h3><div style="overflow-x:auto"><table class="dt"><thead><tr><th>Pseudonym</th><th>Email</th><th>Registered</th><th>Action</th></tr></thead><tbody id="aST"></tbody></table></div><p id="aNST" class="text-center text-sm py-3" style="color:var(--muted);display:none">No sellers yet.</p></div>
+  <div class="gc"><h3 class="font-bold text-sm mb-2" style="color:var(--accent)"><i class="fas fa-clipboard-list mr-1"></i>All Offers</h3><div style="overflow-x:auto"><table class="dt"><thead><tr><th>Seller</th><th>Currency</th><th>Price</th><th>Min</th><th>Max</th><th>Payment</th><th>Action</th></tr></thead><tbody id="aOT"></tbody></table></div><p id="aNOT" class="text-center text-sm py-3" style="color:var(--muted);display:none">No offers yet.</p></div>
+</div>
+</div>
+
+<!-- ==================== RULES ==================== -->
+<div class="vw" id="vRules">
+<nav class="flex items-center justify-between px-5 py-2" style="background:rgba(7,7,12,.95);border-bottom:1px solid var(--border)"><div class="flex items-center gap-2 cursor-pointer" onclick="gV('vLand')"><img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" class="li"><span class="lf text-xs font-bold">LIBERTAS <span style="color:var(--accent)">XMR</span></span></div><button class="bs bsm" onclick="gV('vLand')"><i class="fas fa-arrow-left mr-1"></i> Home</button></nav>
+<div class="max-w-3xl mx-auto px-5 py-8"><h2 class="lf text-lg font-bold mb-6" style="color:var(--accent)"><i class="fas fa-gavel mr-2"></i>Community Rules</h2><div class="gc"><ol style="font-size:12px;color:var(--muted)" class="space-y-3"><li><span style="color:var(--fg);font-weight:bold">1.</span> <span style="color:var(--fg)">Respect above all.</span> No harassment, threats, or abuse.</li><li><span style="color:var(--fg);font-weight:bold">2.</span> <span style="color:var(--fg)">No scams.</span> Fraud results in permanent ban.</li><li><span style="color:var(--fg);font-weight:bold">3.</span> <span style="color:var(--fg)">No escrow.</span> We do NOT hold funds. Trade at your own risk.</li><li><span style="color:var(--fg);font-weight:bold">4.</span> <span style="color:var(--fg)">Buyer sends payment ONLY after receiving XMR.</span></li><li><span style="color:var(--fg);font-weight:bold">5.</span> <span style="color:var(--fg)">Seller releases XMR ONLY after confirming payment.</span></li><li><span style="color:var(--fg);font-weight:bold">6.</span> <span style="color:var(--fg)">No KYC required.</span> Never ask for personal documents.</li><li><span style="color:var(--fg);font-weight:bold">7.</span> <span style="color:var(--fg)">USDT to XMR trades welcome.</span> Same rules apply.</li><li><span style="color:var(--fg);font-weight:bold">8.</span> <span style="color:var(--fg)">One account per person.</span> No manipulation.</li><li><span style="color:var(--fg);font-weight:bold">9.</span> <span style="color:var(--fg)">Report scammers.</span> Evidence required.</li><li><span style="color:var(--fg);font-weight:bold">10.</span> <span style="color:var(--fg)">Voluntary donations keep this alive.</span> Donate XMR if you can.</li></ol></div></div>
+</div>
+
+<!-- ==================== TERMS ==================== -->
+<div class="vw" id="vTerms">
+<nav class="flex items-center justify-between px-5 py-2" style="background:rgba(7,7,12,.95);border-bottom:1px solid var(--border)"><div class="flex items-center gap-2 cursor-pointer" onclick="gV('vLand')"><img src="https://z-cdn-media.chatglm.cn/files/b2a7158d-ff33-4953-9e9f-5a61f82b5380.png?auth_key=1878897010-24e3e503d43542759541806beb6473a5-0-3f990f31f5ece3e04d8d8baed92dc1bf" alt="Logo" class="li"><span class="lf text-xs font-bold">LIBERTAS <span style="color:var(--accent)">XMR</span></span></div><button class="bs bsm" onclick="gV('vLand')"><i class="fas fa-arrow-left mr-1"></i> Home</button></nav>
+<div class="max-w-3xl mx-auto px-5 py-8"><h2 class="lf text-lg font-bold mb-6" style="color:var(--accent)"><i class="fas fa-file-contract mr-2"></i>Terms of Service</h2><div class="gc space-y-4" style="font-size:12px;color:var(--muted)"><div><h3 style="color:var(--fg);font-weight:bold;margin-bottom:4px">1. Acceptance of Terms</h3><p>By using LibertasXMR, you agree to these terms.</p></div><div><h3 style="color:var(--fg);font-weight:bold;margin-bottom:4px">2. Nature of Service</h3><p>LibertasXMR is a semi-decentralized P2P connection platform. We only connect buyers and sellers of Monero. We do NOT hold, store, or transfer funds. We do NOT act as escrow.</p></div><div><h3 style="color:var(--fg);font-weight:bold;margin-bottom:4px">3. No Liability</h3><p>LibertasXMR is NOT responsible for financial losses, scams, or disputes. Connection only. Trade at your own risk.</p></div><div><h3 style="color:var(--fg);font-weight:bold;margin-bottom:4px">4. Privacy</h3><p>No KYC. Anonymous emails and pseudonyms. Minimal data collected. Not shared with third parties.</p></div><div><h3 style="color:var(--fg);font-weight:bold;margin-bottom:4px">5. Prohibited Activities</h3><p>No fraud, scams, theft, money laundering, harassment, or multi-account manipulation.</p></div><div><h3 style="color:var(--fg);font-weight:bold;margin-bottom:4px">6. Account Termination</h3><p>We may ban violators. You may delete your account anytime.</p></div><div><h3 style="color:var(--fg);font-weight:bold;margin-bottom:4px">7. Donations</h3><p>Voluntary XMR donations only. No fees. Non-refundable, used for infrastructure.</p></div><div><h3 style="color:var(--fg);font-weight:bold;margin-bottom:4px">8. Intellectual Property</h3><p>All rights reserved to Iury Lee, Brazilian developer and creator of LibertasXMR.</p></div></div></div>
+</div>
+
+<!-- Delete Modal -->
+<div class="mo" id="dMod"><div class="mbox text-center"><div class="text-3xl mb-2" style="color:var(--danger)"><i class="fas fa-exclamation-triangle"></i></div><h3 class="lf text-sm font-bold mb-2">Confirm Deletion</h3><p style="font-size:12px;color:var(--muted)" id="dMsg">Are you sure? This cannot be undone.</p><div class="flex gap-2 justify-center mt-4"><button class="bs" onclick="cDM()">Cancel</button><button class="bd" id="dCB">Delete</button></div></div></div>
+
+<script>
+/* ================================================
+   LibertasXMR — Lógica completa
+   ================================================ */
+
+const XMR_ADDR='46rkM2n1YnHLe95X8VwRZW6Kbi1pmLDuyDzJz4HS2DmZBw3Ss4mBYCb7x7ViEbUnoqEi9Vcd4yr4ZjJymAKv73447qFWuCv';
+
+// i18n
+const TR={en:{enterBtn:"Enter",heroSub:"The true successor to LocalMonero & AgoraDesk. Peer-to-peer Monero trading. No KYC. No middleman. Pure freedom.",heroSub2:"Semi-decentralized. Trust-based. Community-driven.",startTrading:"Start Trading",learnMore:"Learn More",statUsers:"Active Users",statTrades:"Trades",statC:"Countries",howTitle:"How It Works",s1t:"1. Register Anonymously",s1d:"Use any email and a pseudonym. No KYC, no personal data. Your privacy is sacred.",s2t:"2. Find Your Counterparty",s2d:"Browse offers. Choose your currency and payment method. Enter a private chat.",s3t:"3. Trade Directly",s3d:"No escrow. No middleman. Trade XMR directly on trust. The site only connects peers. Send money ONLY after receiving XMR.",aboutTitle:"About LibertasXMR",histTitle:"Our History",histText:"When LocalMonero and AgoraDesk shut down, the P2P Monero community was left orphaned. Thousands of users who relied on peer-to-peer, no-KYC trading had nowhere to go. LibertasXMR was born from this void in 2026 — created by Brazilian developer Iury Lee as a direct response to the centralization and surveillance creeping into crypto exchanges. We believe financial privacy is a human right, and Monero is its strongest tool. This platform is semi-decentralized: we connect buyers and sellers, but we never hold your funds. No escrow, no KYC, no surveillance. Just people trading Monero freely.",whyTitle:"Why LibertasXMR?",devTitle:"The Developer",devText:"LibertasXMR was designed and developed by Iury Lee, a Brazilian developer passionate about cryptocurrency freedom and privacy rights. All rights reserved. This project is maintained through voluntary donations — no fees, no hidden charges.",authTitle:"Do you want to Buy or Sell XMR?",authSub:"Choose your role. Same freedom, same privacy.",buyTitle:"I Want to Buy XMR",buyDesc:"Find sellers, negotiate, purchase Monero anonymously.",enterBuy:"Enter as Buyer",sellTitle:"I Want to Sell XMR",sellDesc:"List offers, set your price, sell to trusted buyers.",enterSell:"Enter as Seller",login:"Login",register:"Register",emLabel:"Anonymous Email",psLabel:"Pseudonym",pwLabel:"Password",buyerMode:"Buyer",sellerMode:"Seller",logout:"Logout",warnBuy:"WARNING: NO escrow. Only send payment AFTER you receive XMR. The site only connects peers and is NOT responsible for trades. No scams. Respect the rules.",warnSell:"WARNING: No escrow. Only release XMR AFTER confirming payment. The site is NOT responsible. No scams. Respect the rules.",buyXMR:"Buy Monero (XMR)",selCur:"Select Your Currency",availOff:"Available Offers",noOff:"No offers for this currency yet.",usdtTab:"USDT to XMR Swap",usdtDesc:"Trade USDT for Monero with peers. No KYC required.",accMgmt:"Account Management",delAcc:"Delete Account & Data",sellXMR:"Sell Monero (XMR)",incTrades:"Incoming Trade Requests",noChats:"No incoming trade requests yet.",createOff:"Create Offer",offCur:"Currency",offPrice:"Price per XMR",offMin:"Min Amount (XMR)",offMax:"Max Amount (XMR)",offPay:"Payment Method",offTerms:"Offer Terms",pubOff:"Publish Offer",myOff:"My Offers",noMyOff:"No offers created yet.",chatWarn:"REMINDER: NO escrow. The site only connects you. Do NOT send money before receiving XMR (buyer). Do NOT release XMR before confirming payment (seller). NO mediation. Trade at your own risk. No scams.",backDash:"Back"},pt:{enterBtn:"Entrar",heroSub:"O verdadeiro substituto do LocalMonero & AgoraDesk. Negociação P2P de Monero. Sem KYC. Sem intermediário. Pura liberdade.",heroSub2:"Semi-descentralizado. Baseado em confiança. Movido pela comunidade.",startTrading:"Começar a Negociar",learnMore:"Saiba Mais",statUsers:"Usuários Ativos",statTrades:"Trocas",statC:"Países",howTitle:"Como Funciona",s1t:"1. Registre-se Anonimamente",s1d:"Use qualquer email e pseudônimo. Sem KYC, sem dados pessoais. Sua privacidade é sagrada.",s2t:"2. Encontre sua Contraparte",s2d:"Navegue ofertas. Escolha moeda e pagamento. Entre em chat privado.",s3t:"3. Negocie Diretamente",s3d:"Sem escrow. Sem intermediário. Negocie XMR na confiança. O site apenas conecta. Envie dinheiro SOMENTE após receber XMR.",aboutTitle:"Sobre o LibertasXMR",histTitle:"Nossa História",histText:"Quando o LocalMonero e o AgoraDesk fecharam, a comunidade P2P de Monero ficou órfã. Milhares de usuários sem KYC não tinham para onde ir. O LibertasXMR nasceu desse vazio em 2026 — criado pelo desenvolvedor brasileiro Iury Lee como resposta direta à centralização e vigilância nas exchanges. Acreditamos que privacidade financeira é direito humano, e o Monero é sua ferramenta mais forte. Semi-descentralizado: conectamos compradores e vendedores, mas nunca seguramos seus fundos. Sem escrow, sem KYC, sem vigilância. Pessoas negociando Monero livremente.",whyTitle:"Por que LibertasXMR?",devTitle:"O Desenvolvedor",devText:"LibertasXMR foi projetado e desenvolvido por Iury Lee, desenvolvedor brasileiro apaixonado por liberdade cripto e direitos de privacidade. Todos os direitos reservados. Mantido através de doações voluntárias — sem taxas, sem cobranças ocultas.",authTitle:"Quer Comprar ou Vender XMR?",authSub:"Escolha seu papel. Mesma liberdade, mesma privacidade.",buyTitle:"Quero Comprar XMR",buyDesc:"Encontre vendedores, negocie, compre Monero anonimamente.",enterBuy:"Entrar como Comprador",sellTitle:"Quero Vender XMR",sellDesc:"Liste ofertas, defina preço, venda para compradores confiáveis.",enterSell:"Entrar como Vendedor",login:"Entrar",register:"Cadastrar",emLabel:"Email Anônimo",psLabel:"Pseudônimo",pwLabel:"Senha",buyerMode:"Comprador",sellerMode:"Vendedor",logout:"Sair",warnBuy:"AVISO: SEM escrow. Só envie pagamento DEPOIS de receber XMR. O site apenas conecta e NÃO é responsável pelas trocas. Sem golpes. Respeite as regras.",warnSell:"AVISO: Sem escrow. Só libere XMR DEPOIS de confirmar pagamento. O site NÃO é responsável. Sem golpes. Respeite as regras.",buyXMR:"Comprar Monero (XMR)",selCur:"Selecione Sua Moeda",availOff:"Ofertas Disponíveis",noOff:"Nenhuma oferta para esta moeda ainda.",usdtTab:"Troca USDT para XMR",usdtDesc:"Troque USDT por Monero com outros usuários. Sem KYC.",accMgmt:"Gerenciar Conta",delAcc:"Excluir Conta e Dados",sellXMR:"Vender Monero (XMR)",incTrades:"Solicitações de Troca Recebidas",noChats:"Nenhuma solicitação de troca ainda.",createOff:"Criar Oferta",offCur:"Moeda",offPrice:"Preço por XMR",offMin:"Qtd Mín (XMR)",offMax:"Qtd Máx (XMR)",offPay:"Método de Pagamento",offTerms:"Termos da Oferta",pubOff:"Publicar Oferta",myOff:"Minhas Ofertas",noMyOff:"Nenhuma oferta criada ainda.",chatWarn:"LEMBRETE: SEM escrow. O site apenas conecta. NÃO envie dinheiro antes de receber XMR (comprador). NÃO libere XMR antes de confirmar pagamento (vendedor). SEM mediação. Negocie por sua conta e risco. Respeite as regras. Sem golpes.",backDash:"Voltar"}};
+let lg='en';
+function sL(l){lg=l;document.querySelectorAll('[data-t]').forEach(e=>{const k=e.getAttribute('data-t');if(TR[l]&&TR[l][k])e.textContent=TR[l][k]});document.getElementById('l1').value=l;document.getElementById('l2').value=l}
+
+function ts(m,t='i'){const c=document.getElementById('tC'),e=document.createElement('div');e.className=`tt ${t}`;e.innerHTML=`<i class="fas fa-${t==='s'?'check-circle':t==='e'?'times-circle':'info-circle'} mr-1"></i>${m}`;c.appendChild(e);setTimeout(()=>{e.style.opacity='0';e.style.transition='opacity .3s';setTimeout(()=>e.remove(),300)},3500)}
+
+(function(){const c=document.getElementById('ptcls');for(let i=0;i<15;i++){const p=document.createElement('div');p.className='ptcl';const s=Math.random()*2.5+.8;p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${Math.random()*14+8}s;animation-delay:${Math.random()*7}s`;c.appendChild(p)}})();
+
+function gV(id){document.querySelectorAll('.vw').forEach(v=>v.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);if(id==='vBuyer')rB();if(id==='vSeller')rS();if(id==='vAdmin'){renderAdmLogin();if(aLog)rA()}}
+function scrollAb(){document.getElementById('abSec')?.scrollIntoView({behavior:'smooth'})}
+
+function gB(){return JSON.parse(localStorage.getItem('lx_b')||'[]')}function sB(d){localStorage.setItem('lx_b',JSON.stringify(d))}
+function gS(){return JSON.parse(localStorage.getItem('lx_s')||'[]')}function sS(d){localStorage.setItem('lx_s',JSON.stringify(d))}
+function gO(){return JSON.parse(localStorage.getItem('lx_o')||'[]')}function sO(d){localStorage.setItem('lx_o',JSON.stringify(d))}
+function gC(){return JSON.parse(localStorage.getItem('lx_c')||'[]')}function sC(d){localStorage.setItem('lx_c',JSON.stringify(d))}
+function gA(){return JSON.parse(localStorage.getItem('lx_adm')||'null')}function sA(d){localStorage.setItem('lx_adm',JSON.stringify(d))}
+
+let cU=null,cR=null,sC2='BRL',cCI=null,aLog=false;
+
+const CU=[{c:'BRL',n:'Real',f:'🇧🇷'},{c:'USD',n:'Dollar',f:'🇺🇸'},{c:'EUR',n:'Euro',f:'🇪🇺'},{c:'ARS',n:'Peso',f:'🇦🇷'},{c:'MXN',n:'Peso',f:'🇲🇽'},{c:'COP',n:'Peso',f:'🇨🇴'},{c:'CLP',n:'Peso',f:'🇨🇱'},{c:'PEN',n:'Sol',f:'🇵🇪'},{c:'GBP',n:'Pound',f:'🇬🇧'},{c:'JPY',n:'Yen',f:'🇯🇵'},{c:'CNY',n:'Yuan',f:'🇨🇳'},{c:'USDT',n:'Tether',f:'💲'},{c:'BTC',n:'Bitcoin',f:'₿'}];
+
+// ---- Auth Usuário ----
+let aM='login',pR2=null;
+function pR(r){pR2=r;document.getElementById('rBuy').style.borderColor=r==='buyer'?'var(--accent)':'var(--border)';document.getElementById('rSell').style.borderColor=r==='seller'?'var(--accent)':'var(--border)';document.getElementById('aF').style.display='block'}
+function aT(t){aM=t;document.getElementById('tL').classList.toggle('act',t==='login');document.getElementById('tR').classList.toggle('act',t==='register');document.getElementById('pF').style.display=t==='register'?'block':'none';document.getElementById('aBtn').innerHTML=t==='login'?`<i class="fas fa-sign-in-alt mr-1"></i>${TR[lg].login}`:`<i class="fas fa-user-plus mr-1"></i>${TR[lg].register}`}
+
+function dA(){
+  const em=document.getElementById('aE').value.trim(),pw=document.getElementById('aPw').value,ps=document.getElementById('aP').value.trim();
+  if(!em||!pw){ts('Fill in all fields.','e');return}
+  if(!pR2){ts('Select Buyer or Seller first.','e');return}
+  const adm=gA();if(adm&&em===adm.email){ts('This email is reserved.','e');return}
+  if(aM==='register'){
+    if(!ps){ts('Enter a pseudonym.','e');return}
+    const ls=pR2==='buyer'?gB():gS();
+    if(ls.find(u=>u.email===em)){ts('Email already registered.','e');return}
+    const u={id:Date.now().toString(),email:em,password:pw,pseudonym:ps,role:pR2,createdAt:new Date().toISOString()};
+    ls.push(u);pR2==='buyer'?sB(ls):sS(ls);
+    cU=u;cR=pR2;ts('Account created!','s');gV(pR2==='buyer'?'vBuyer':'vSeller')
+  }else{
+    const ls=pR2==='buyer'?gB():gS();
+    const u=ls.find(u=>u.email===em&&u.password===pw);
+    if(!u){ts('Invalid email or password.','e');return}
+    cU=u;cR=pR2;ts(`Welcome, ${u.pseudonym}!`,'s');gV(pR2==='buyer'?'vBuyer':'vSeller')
+  }
+}
+function dLo(){cU=null;cR=null;ts('Logged out.','i');gV('vAuth')}
+function dAc(){const m=document.getElementById('dMod');m.classList.add('on');document.getElementById('dMsg').textContent=lg==='pt'?'Tem certeza? Todos os dados serão excluídos permanentemente.':'Are you sure? All data will be permanently deleted.';document.getElementById('dCB').onclick=()=>{const ls=cR==='buyer'?gB():gS();cR==='buyer'?sB(ls.filter(u=>u.id!==cU.id)):sS(ls.filter(u=>u.id!==cU.id));sO(gO().filter(o=>o.sellerId!==cU.id));cDM();cU=null;cR=null;ts('Account deleted.','s');gV('vAuth')}}
+function cDM(){document.getElementById('dMod').classList.remove('on')}
+
+// ---- Auth Admin ----
+let admMode='login';
+function admTab(t){
+  admMode=t;
+  document.getElementById('aTL').classList.toggle('act',t==='login');
+  document.getElementById('aTR').classList.toggle('act',t==='register');
+  const adm=gA();
+  // Se já existe admin, não pode registrar
+  if(t==='register'&&adm){ts('Admin account already exists. Only ONE admin is allowed.','e');admMode='login';document.getElementById('aTL').classList.add('act');document.getElementById('aTR').classList.remove('act');return}
+  document.getElementById('admRegMsg').style.display=t==='register'?'block':'none';
+  document.getElementById('admBtn').innerHTML=t==='login'?'<i class="fas fa-lock mr-1"></i>Login':'<i class="fas fa-user-plus mr-1"></i>Create Admin Account';
+}
+
+function renderAdmLogin(){
+  const adm=gA();
+  if(aLog){document.getElementById('aL').style.display='none';document.getElementById('aD').style.display='block';return}
+  document.getElementById('aL').style.display='flex';document.getElementById('aD').style.display='none';
+  // Se admin já existe, esconder aba Register
+  if(adm){document.getElementById('aTR').style.display='none';document.getElementById('admRegMsg').style.display='none'}
+  else{document.getElementById('aTR').style.display=''}
+}
+
+function admAuth(){
+  const em=document.getElementById('admE').value.trim(),pw=document.getElementById('admPw').value;
+  if(!em||!pw){ts('Fill in all fields.','e');return}
+
+  if(admMode==='register'){
+    const existing=gA();
+    if(existing){ts('Admin account already exists! Only ONE admin is allowed.','e');return}
+    const adm={email:em,password:pw,createdAt:new Date().toISOString()};
+    sA(adm);
+    aLog=true;
+    document.getElementById('admWho').textContent=em;
+    ts('Admin account created successfully!','s');
+    document.getElementById('aL').style.display='none';document.getElementById('aD').style.display='block';
+    rA();
+  }else{
+    const adm=gA();
+    if(!adm){ts('No admin account exists yet. Register first.','e');return}
+    if(em!==adm.email||pw!==adm.password){ts('Invalid email or password.','e');return}
+    aLog=true;
+    document.getElementById('admWho').textContent=em;
+    ts('Admin access granted.','s');
+    document.getElementById('aL').style.display='none';document.getElementById('aD').style.display='block';
+    rA();
+  }
+}
+function admLogout(){aLog=false;ts('Admin logged out.','i');document.getElementById('aD').style.display='none';document.getElementById('aL').style.display='flex';document.getElementById('admE').value='';document.getElementById('admPw').value=''}
+
+// ---- Buyer ----
+function rB(){
+  if(!cU)return;document.getElementById('bN').textContent=cU.pseudonym;
+  const g=document.getElementById('cG');g.innerHTML='';
+  CU.forEach(c=>{const d=document.createElement('div');d.className=`fb ${sC2===c.c?'sl':''}`;d.innerHTML=`<span style="font-size:14px">${c.f}</span>${c.c}`;d.onclick=()=>{sC2=c.c;rB()};g.appendChild(d)});
+  document.getElementById('bCL').textContent=sC2;
+  const ofs=gO().filter(o=>o.currency===sC2),el=document.getElementById('bO'),nm=document.getElementById('bNO');
+  if(!ofs.length){el.innerHTML='';nm.style.display='block'}else{nm.style.display='none';el.innerHTML=ofs.map(o=>`<div class="oc mb-2"><div class="flex items-center justify-between flex-wrap gap-2"><div><span style="font-size:10px;background:var(--adim);color:var(--accent)" class="px-2 py-1 rounded-full">${CU.find(c=>c.c===o.currency)?.f||''} ${o.currency}</span><span class="ml-1 font-bold" style="color:var(--fg)">${o.pseudonym}</span></div><div class="text-right"><div class="font-bold" style="color:var(--accent)">${o.price} ${o.currency}/XMR</div><div style="font-size:10px;color:var(--muted)">${o.minAmt} - ${o.maxAmt} XMR</div></div></div><div class="mt-2 flex items-center justify-between flex-wrap gap-2"><div style="font-size:10px;color:var(--muted)"><i class="fas fa-credit-card mr-1"></i>${o.paymentMethod}</div><button class="bp bsm" onclick="oCB('${o.id}','${o.sellerId}','${o.pseudonym}',${o.price},'${o.currency}')"><i class="fas fa-comment-dots mr-1"></i>${lg==='pt'?'Negociar':'Trade'}</button></div>${o.terms?`<div class="mt-1" style="font-size:10px;color:var(--muted);border-top:1px solid var(--border);padding-top:5px"><i class="fas fa-info-circle mr-1"></i>${o.terms}</div>`:''}</div>`).join('')}
+  const ufs=gO().filter(o=>o.currency==='USDT'),ue=document.getElementById('uO');
+  if(!ufs.length)ue.innerHTML=`<p style="font-size:11px;color:var(--muted)" class="py-2">No USDT offers.</p>`;else ue.innerHTML=ufs.map(o=>`<div class="oc mb-2"><div class="flex items-center justify-between flex-wrap gap-2"><div><span class="font-bold" style="color:var(--fg)">${o.pseudonym}</span><span style="font-size:10px;color:var(--muted)" class="ml-1">${o.paymentMethod}</span></div><div class="font-bold" style="color:var(--accent)">${o.price} USDT/XMR</div></div><div class="mt-1 text-right"><button class="bp bsm" onclick="oCB('${o.id}','${o.sellerId}','${o.pseudonym}',${o.price},'USDT')"><i class="fas fa-comment-dots mr-1"></i>${lg==='pt'?'Negociar':'Trade'}</button></div></div>`).join('');
+  uSt()
+}
+
+// ---- Seller ----
+function rS(){
+  if(!cU)return;document.getElementById('sN').textContent=cU.pseudonym;
+  const sel=document.getElementById('oC');sel.innerHTML=CU.map(c=>`<option value="${c.c}">${c.f} ${c.c} - ${c.n}</option>`).join('');
+  const chs=gC().filter(c=>c.sellerId===cU.id),cl=document.getElementById('sCL'),nc=document.getElementById('nCh');
+  if(!chs.length){cl.innerHTML='';nc.style.display='block'}else{nc.style.display='none';cl.innerHTML=chs.map(c=>`<div class="oc mb-2"><div class="flex items-center justify-between flex-wrap gap-2"><div><span style="font-size:10px;color:var(--muted)">Buyer:</span><span class="font-bold ml-1" style="color:var(--accent)">${c.buyerPseudo}</span><span style="font-size:10px;color:var(--muted)" class="ml-1">${c.price} ${c.currency}/XMR</span></div><button class="bp bsm" onclick="oCS('${c.id}')"><i class="fas fa-comment-dots mr-1"></i>Chat</button></div></div>`).join('')}
+  const my=gO().filter(o=>o.sellerId===cU.id),ml=document.getElementById('sMO'),nm=document.getElementById('nMO');
+  if(!my.length){ml.innerHTML='';nm.style.display='block'}else{nm.style.display='none';ml.innerHTML=my.map(o=>`<div class="oc mb-2"><div class="flex items-center justify-between flex-wrap gap-2"><div><span style="font-size:10px;background:var(--adim);color:var(--accent)" class="px-2 py-1 rounded-full">${CU.find(c=>c.c===o.currency)?.f||''} ${o.currency}</span><span class="ml-1 font-bold" style="color:var(--accent)">${o.price} ${o.currency}/XMR</span></div><button class="bd bsm" onclick="dOf('${o.id}')"><i class="fas fa-trash mr-1"></i>${lg==='pt'?'Remover':'Remove'}</button></div><div style="font-size:10px;color:var(--muted)" class="mt-1">${o.minAmt} - ${o.maxAmt} XMR | ${o.paymentMethod}</div></div>`).join('')}
+  uSt()
+}
+function cOf(){const cur=document.getElementById('oC').value,pr=parseFloat(document.getElementById('oPr').value),mn=parseFloat(document.getElementById('oMn').value),mx=parseFloat(document.getElementById('oMx').value),pm=document.getElementById('oPm').value.trim(),tm=document.getElementById('oTm').value.trim();if(!pr||!mn||!mx||!pm){ts('Fill all required fields.','e');return}if(mn>mx){ts('Min cannot exceed Max.','e');return}const o={id:Date.now().toString(),sellerId:cU.id,pseudonym:cU.pseudonym,currency:cur,price:pr,minAmt:mn,maxAmt:mx,paymentMethod:pm,terms:tm,createdAt:new Date().toISOString()};const ofs=gO();ofs.push(o);sO(ofs);ts('Offer published!','s');['oPr','oMn','oMx','oPm','oTm'].forEach(id=>document.getElementById(id).value='');rS()}
+function dOf(id){sO(gO().filter(o=>o.id!==id));ts('Offer removed.','i');rS()}
+
+// ---- Chat ----
+function oCB(oid,sid,sp,pr,cur){cCI=`${cU.id}_${sid}_${oid}`;const chs=gC();let ch=chs.find(c=>c.id===cCI);if(!ch){ch={id:cCI,offerId:oid,buyerId:cU.id,buyerPseudo:cU.pseudonym,sellerId:sid,sellerPseudo:sp,price:pr,currency:cur,messages:[],createdAt:new Date().toISOString()};chs.push(ch);sC(chs)}document.getElementById('cW').innerHTML=`<i class="fas fa-user-secret mr-1"></i>${sp}`;document.getElementById('cI').innerHTML=`<div class="flex items-center justify-between flex-wrap gap-2"><div><span style="font-size:10px;color:var(--muted)">${lg==='pt'?'Vendedor':'Seller'}:</span><span class="font-bold ml-1" style="color:var(--accent)">${sp}</span></div><div class="font-bold" style="color:var(--accent)">${pr} ${cur}/XMR</div></div>`;document.getElementById('cB').onclick=()=>gV('vBuyer');rCh();gV('vChat')}
+function oCS(cid){const ch=gC().find(c=>c.id===cid);if(!ch)return;cCI=cid;document.getElementById('cW').innerHTML=`<i class="fas fa-user-secret mr-1"></i>${ch.buyerPseudo}`;document.getElementById('cI').innerHTML=`<div class="flex items-center justify-between flex-wrap gap-2"><div><span style="font-size:10px;color:var(--muted)">${lg==='pt'?'Comprador':'Buyer'}:</span><span class="font-bold ml-1" style="color:var(--accent)">${ch.buyerPseudo}</span></div><div class="font-bold" style="color:var(--accent)">${ch.price} ${ch.currency}/XMR</div></div>`;document.getElementById('cB').onclick=()=>gV('vSeller');rCh();gV('vChat')}
+function rCh(){const ch=gC().find(c=>c.id===cCI),el=document.getElementById('cM');if(!ch||!ch.messages.length){el.innerHTML=`<p class="text-center text-sm py-5" style="color:var(--muted)">${lg==='pt'?'Nenhuma mensagem. Diga olá!':'No messages yet. Say hello!'}</p>`;return}el.innerHTML=ch.messages.map(m=>`<div class="cm ${m.sid===cU.id?'me':'th'}"><div style="font-size:9px;color:var(--muted);margin-bottom:2px">${m.sp} · ${new Date(m.ts).toLocaleTimeString()}</div><div class="bb">${m.tx}</div></div>`).join('');el.scrollTop=el.scrollHeight}
+function sMsg(){const inp=document.getElementById('cIn'),tx=inp.value.trim();if(!tx)return;const chs=gC(),ch=chs.find(c=>c.id===cCI);if(!ch)return;ch.messages.push({sid:cU.id,sp:cU.pseudonym,tx,ts:new Date().toISOString()});sC(chs);inp.value='';rCh()}
+
+// ---- Admin Dashboard ----
+function rA(){
+  const b=gB(),s=gS(),o=gO(),c=gC();
+  document.getElementById('aSB').textContent=b.length;document.getElementById('aSS').textContent=s.length;document.getElementById('aSO').textContent=o.length;document.getElementById('aSC').textContent=c.length;
+  const bt=document.getElementById('aBT'),nb=document.getElementById('aNBT');
+  if(!b.length){bt.innerHTML='';nb.style.display='block'}else{nb.style.display='none';bt.innerHTML=b.map(u=>`<tr><td class="font-bold" style="color:var(--accent)">${u.pseudonym}</td><td>${u.email}</td><td style="font-size:10px;color:var(--muted)">${new Date(u.createdAt).toLocaleDateString()}</td><td><button class="bd bsm" onclick="aDU('buyer','${u.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('')}
+  const st=document.getElementById('aST'),ns=document.getElementById('aNST');
+  if(!s.length){st.innerHTML='';ns.style.display='block'}else{ns.style.display='none';st.innerHTML=s.map(u=>`<tr><td class="font-bold" style="color:var(--accent)">${u.pseudonym}</td><td>${u.email}</td><td style="font-size:10px;color:var(--muted)">${new Date(u.createdAt).toLocaleDateString()}</td><td><button class="bd bsm" onclick="aDU('seller','${u.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('')}
+  const ot=document.getElementById('aOT'),no=document.getElementById('aNOT');
+  if(!o.length){ot.innerHTML='';no.style.display='block'}else{no.style.display='none';ot.innerHTML=o.map(o=>`<tr><td class="font-bold" style="color:var(--accent)">${o.pseudonym}</td><td>${CU.find(c=>c.c===o.currency)?.f||''} ${o.currency}</td><td>${o.price}</td><td>${o.minAmt}</td><td>${o.maxAmt}</td><td style="font-size:10px">${o.paymentMethod}</td><td><button class="bd bsm" onclick="aDO('${o.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('')}
+}
+function aDU(r,id){r==='buyer'?sB(gB().filter(u=>u.id!==id)):sS(gS().filter(u=>u.id!==id));sO(gO().filter(o=>o.sellerId!==id));ts('User deleted.','i');rA()}
+function aDO(id){sO(gO().filter(o=>o.id!==id));ts('Offer deleted.','i');rA()}
+
+function copyAddr(){navigator.clipboard.writeText(XMR_ADDR).then(()=>ts('XMR address copied!','s')).catch(()=>ts('Copy failed.','e'))}
+function uSt(){const t=gB().length+gS().length;const a=document.getElementById('sU'),b=document.getElementById('sT');if(a)a.textContent=t;if(b)b.textContent=gC().length}
+
+if(gS().length===0){sS([{id:'s1',email:'ghost@proton.me',password:'demo123',pseudonym:'XMRGhost',role:'seller',createdAt:new Date().toISOString()},{id:'s2',email:'shadow@tutanota.com',password:'demo123',pseudonym:'ShadowNode',role:'seller',createdAt:new Date().toISOString()},{id:'s3',email:'darkcoin@pm.me',password:'demo123',pseudonym:'DarkCoinBR',role:'seller',createdAt:new Date().toISOString()}]);sO([{id:'o1',sellerId:'s1',pseudonym:'XMRGhost',currency:'BRL',price:1750,minAmt:0.1,maxAmt:2,paymentMethod:'PIX',terms:'Envie comprovante PIX antes. XMR liberado em até 10min.',createdAt:new Date().toISOString()},{id:'o2',sellerId:'s1',pseudonym:'XMRGhost',currency:'USD',price:165,minAmt:0.5,maxAmt:5,paymentMethod:'Cash App / Zelle',terms:'Send payment screenshot first.',createdAt:new Date().toISOString()},{id:'o3',sellerId:'s2',pseudonym:'ShadowNode',currency:'BRL',price:1780,minAmt:0.05,maxAmt:1,paymentMethod:'PIX / Banco Inter',terms:'PIX instantâneo apenas.',createdAt:new Date().toISOString()},{id:'o4',sellerId:'s2',pseudonym:'ShadowNode',currency:'EUR',price:152,minAmt:0.1,maxAmt:3,paymentMethod:'SEPA / Revolut',terms:'SEPA verified only.',createdAt:new Date().toISOString()},{id:'o5',sellerId:'s3',pseudonym:'DarkCoinBR',currency:'USDT',price:162,minAmt:0.5,maxAmt:10,paymentMethod:'USDT TRC20 / ERC20',terms:'USDT primeiro, XMR após confirmação.',createdAt:new Date().toISOString()},{id:'o6',sellerId:'s3',pseudonym:'DarkCoinBR',currency:'BRL',price:1760,minAmt:0.2,maxAmt:3,paymentMethod:'PIX',terms:'Negociação rápida via PIX.',createdAt:new Date().toISOString()}])}
+uSt();
+</script>
+</body>
+</html>
